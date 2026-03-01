@@ -1,0 +1,37 @@
+# LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.nav
+*.snm
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.run.xml
+*.bcf
+
+# Research Report & Presentation (User requested to ignore "things")
+enzymology_research_report.pdf
+presentation.pdf
+model_b_slides.pdf
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+.env
+
+# Project specific
+logs/
+outputs/models/
+outputs/reports/*.json
+outputs/exports/
+.github_history_log
+simulate_git.sh

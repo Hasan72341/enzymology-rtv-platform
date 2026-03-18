@@ -1,0 +1,26 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+    environment:
+      - PORT=8000
+
+  frontend:
+    build:
+      context: ./web-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - WATCHPACK_POLLING=true
+
+  cli:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    entrypoint: [ "python", "cli.py" ]

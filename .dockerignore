@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+logs/*
+outputs/*
+.env
+venv/
+env/
+.git/
+.vscode/
+web-frontend/node_modules/
+!outputs/.gitkeep
+!logs/.gitkeep

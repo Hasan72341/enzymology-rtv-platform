@@ -1,0 +1,53 @@
+[
+  {
+    "name": "gst",
+    "ec": "2.5.1.18",
+    "real_world_problem": "Detoxification & bioremediation",
+    "n_samples": 160,
+    "n_unique_uniprot": 5,
+    "n_unique_organism": 32,
+    "log_kcat_min": -1.6111416306951871,
+    "log_kcat_max": 2.8143844495937604,
+    "best_model": "xgboost",
+    "best_spearman": 0.9032214501859286,
+    "best_r2": 0.8227112991280867,
+    "best_rmse": 0.4249625947373974,
+    "best_mae": 0.33677341664010874,
+    "opt_ph": 6.969387755102041,
+    "opt_temp": 29.79591836734694
+  },
+  {
+    "name": "laccase",
+    "ec": "1.10.3.2",
+    "real_world_problem": "Wastewater dye degradation",
+    "n_samples": 290,
+    "n_unique_uniprot": 5,
+    "n_unique_organism": 58,
+    "log_kcat_min": -1.809244280680471,
+    "log_kcat_max": 3.07066774672481,
+    "best_model": "xgboost",
+    "best_spearman": 0.856787649718336,
+    "best_r2": 0.7851480855156434,
+    "best_rmse": 0.4809108974041865,
+    "best_mae": 0.33705054081672703,
+    "opt_ph": 4.719387755102041,
+    "opt_temp": 54.79591836734694
+  },
+  {
+    "name": "lactase",
+    "ec": "3.2.1.23",
+    "real_world_problem": "Lactose-free dairy processing",
+    "n_samples": 145,
+    "n_unique_uniprot": 5,
+    "n_unique_organism": 29,
+    "log_kcat_min": -1.2291479883578558,
+    "log_kcat_max": 3.932423026376739,
+    "best_model": "xgboost",
+    "best_spearman": 0.7164742804004196,
+    "best_r2": 0.7538912577337944,
+    "best_rmse": 0.44992978735375794,
+    "best_mae": 0.3084735686914648,
+    "opt_ph": 6.519387755102041,
+    "opt_temp": 48.79591836734694
+  }
+]

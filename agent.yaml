@@ -1,0 +1,162 @@
+project:
+  name: enzyme_selection_bioprocess_optimization
+  mode: automated
+  description: >
+    Select best enzyme variant using sequence embeddings,
+    then optimize bioprocess conditions (pH, temperature)
+    for maximum catalytic efficiency.
+
+datasets:
+  enzymes:
+    - name: gst
+      csv: data/gst.csv
+      ec: "2.5.1.18"
+      real_world_problem: "Detoxification & bioremediation"
+    - name: laccase
+      csv: data/laccase.csv
+      ec: "1.10.3.2"
+      real_world_problem: "Wastewater dye degradation"
+    - name: lactase
+      csv: data/lactase.csv
+      ec: "3.2.1.23"
+      real_world_problem: "Lactose-free dairy processing"
+
+schema:
+  columns:
+    required:
+      - ec
+      - organism
+      - log_kcat
+      - n_measurements
+      - uniprot_primary
+      - sequence
+    optional:
+      - ph_opt
+      - ph_max
+      - temp_opt
+      - temp_max
+      - molecularWeight
+      - kmValue
+
+preprocessing:
+  deduplicate:
+    enabled: false  # Disabled to preserve measurement variance
+    by: uniprot_primary
+  filter:
+    min_sequence_length: 50
+    min_samples_per_ec: 5  # Lowered from 50 to accommodate smaller datasets
+  numeric_cast:
+    - log_kcat
+    - n_measurements
+    - ph_opt
+    - ph_max
+    - temp_opt
+    - temp_max
+    - molecularWeight
+    - kmValue
+  missing_value_strategy:
+    drop_if_missing:
+      - log_kcat
+      - sequence
+    impute_if_missing:
+      molecularWeight: median
+      kmValue: median
+
+feature_engineering:
+  sequence_embedding:
+    method: esm2
+    provider: local          # fully local – no external API
+    backend: pytorch         # 'pytorch' (GPU/CPU) | 'onnx' (CPU-optimised)
+    model: esm2_t12_35M      # 35M params: fast on CPU; swap to esm2_t33_650M for max accuracy
+    pooling: mean
+    output_dim: 480          # 35M model hidden dim; change to 1280 if using 650M
+    batch_size: 8
+    max_length: 1024
+
+  scalar_features:
+    intrinsic:
+      - molecularWeight
+      - log_kmValue
+      - n_measurements
+    process:
+      - ph
+      - temperature
+
+models:
+  enzyme_selection:
+    name: Model_A
+    objective: maximize_log_kcat
+    input_features:
+      - esm_embedding
+      - molecularWeight
+      - log_kmValue
+    target: log_kcat
+    models:
+      - random_forest
+      - xgboost
+      - hybrid_ensemble
+      - linear_probe
+    sample_weight: n_measurements
+    evaluation:
+      metrics:
+        - r2
+        - rmse
+        - spearman
+    output:
+      ranked_enzymes: true
+      top_k: 3
+
+  bioprocess_optimization:
+    name: Model_B
+    objective: optimize_ph_temperature
+    input_features:
+      - ph
+      - temperature
+    target: log_kcat
+    models:
+      - gaussian_process
+      - xgboost
+    constraints:
+      ph_range:
+        source: ph_opt
+        margin: 1.5
+      temperature_range:
+        source: temp_opt
+        margin: 10
+
+optimization:
+  strategy: grid_search
+  resolution:
+    ph_steps: 50
+    temperature_steps: 50
+  objective_function: predicted_log_kcat
+  stability_penalty:
+    enabled: true
+    lambda: 0.1
+
+outputs:
+  per_enzyme:
+    - selected_uniprot
+    - predicted_log_kcat
+    - optimal_ph
+    - optimal_temperature
+    - confidence_interval
+  visualizations:
+    - enzyme_ranking_barplot
+    - ph_temperature_contour
+    - feature_importance
+  reports:
+    format: markdown
+    include:
+      - dataset_summary
+      - model_performance
+      - industrial_interpretation
+
+execution:
+  loop_over_datasets: true
+  parallel: false
+  reproducibility:
+    random_seed: 42
+  logging:
+    level: INFO
+    save_intermediate: true
